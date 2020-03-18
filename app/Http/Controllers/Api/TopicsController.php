@@ -87,4 +87,9 @@ class TopicsController extends Controller
         return TopicResource::collection($topics);
     }
 
+    public function show(Topic $topic)
+    {
+        return new TopicResource($topic);
+    }
+
 }
