@@ -2,7 +2,7 @@
 namespace App\Handlers;
 
 use  Illuminate\Support\Str;
-use Image;
+use Intervention\Image\Facades\Image;
 
 class ImageUploadHandler
 {
