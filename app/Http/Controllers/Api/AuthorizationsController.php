@@ -8,11 +8,51 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\AuthenticationException;
 use App\Http\Requests\Api\SocialAuthorizationRequest;
 use App\Http\Requests\Api\AuthorizationRequest;
+use Psr\Http\Message\ServerRequestInterface;
+use League\OAuth2\Server\AuthorizationServer;
+use Zend\Diactoros\Response as Psr7Response;
+use League\OAuth2\Server\Exception\OAuthServerException;
+
 
 class AuthorizationsController extends Controller
 {
 
-    public function store(AuthorizationRequest $request)
+
+    public function store(AuthorizationRequest $originRequest, AuthorizationServer $server, ServerRequestInterface $serverRequest)
+    {
+        try {
+            return $server->respondToAccessTokenRequest($serverRequest, new Psr7Response)->withStatus(201);
+        } catch(OAuthServerException $e) {
+            throw new AuthenticationException($e->getMessage());
+        }
+    }
+
+
+
+    public function update(AuthorizationServer $server, ServerRequestInterface $serverRequest)
+    {
+        try {
+            return $server->respondToAccessTokenRequest($serverRequest, new Psr7Response);
+        } catch(OAuthServerException $e) {
+            return $this->response->errorUnauthorized($e->getMessage());
+        }
+    }
+
+
+
+    public function destroy()
+    {
+        if (auth('api')->check()) {
+            auth('api')->user()->token()->revoke();
+            return response(null, 204);
+        } else {
+            throw new AuthenticationException('The token is invalid.');
+        }
+    }
+
+
+
+    public function store_JWT(AuthorizationRequest $request)
     {
         $username = $request->username;
 
@@ -90,13 +130,13 @@ class AuthorizationsController extends Controller
         ]);
     }
 
-    public function update()
+    public function update_JWT()
     {
         $token = auth('api')->refresh();
         return $this->respondWithToken($token);
     }
 
-    public function destroy()
+    public function destroy_JWT()
     {
         auth('api')->logout();
         return response(null, 204);
