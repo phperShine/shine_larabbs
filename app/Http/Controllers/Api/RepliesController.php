@@ -32,4 +32,22 @@ class RepliesController extends Controller
 
         return response(null, 204);
     }
+
+
+    public function index(Topic $topic)
+    {
+        $replies = $topic->replies()->with('user','topic')->paginate();
+
+        return ReplyResource::collection($replies);
+    }
+
+
+    public function userIndex($userId,Reply $reply)
+    {
+        $replies = $reply->where('user_id', $userId)->with('user','topic')->paginate();
+
+        return ReplyResource::collection($replies);
+    }
+
+
 }

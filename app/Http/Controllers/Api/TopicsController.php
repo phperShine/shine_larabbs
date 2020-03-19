@@ -39,7 +39,7 @@ class TopicsController extends Controller
         return response(null, 204);
     }
 
-    public function index_BAK(Request $request, Topic $topic)
+    public function index(Request $request, Topic $topic)
     {
         $query = $topic->query();
 
@@ -56,7 +56,7 @@ class TopicsController extends Controller
     }
 
 
-    public function index(Request $request, Topic $topic)
+    public function index_BAK(Request $request, Topic $topic)
     {
         $topics = QueryBuilder::for(Topic::class)
             ->allowedIncludes('user', 'category')
@@ -75,7 +75,19 @@ class TopicsController extends Controller
     {
         $query = $user->topics()->getQuery();
 
-        $topics = QueryBuilder::for($query)
+
+        if ($categoryId = $request->category_id) {
+            $query->where('category_id', $categoryId);
+        }
+
+        $topics = $query
+            ->with('user', 'category')
+            ->withOrder($request->order)
+            ->paginate();
+
+        return TopicResource::collection($topics);
+
+       /* $topics = QueryBuilder::for($query)
             ->allowedIncludes('user', 'category')
             ->allowedFilters([
                 'title',
@@ -84,7 +96,7 @@ class TopicsController extends Controller
             ])
             ->paginate();
 
-        return TopicResource::collection($topics);
+        return TopicResource::collection($topics);*/
     }
 
     public function show(Topic $topic)
