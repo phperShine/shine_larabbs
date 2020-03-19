@@ -52,4 +52,21 @@ class Handler extends ExceptionHandler
     {
         return parent::render($request, $exception);
     }
+
+    //可以重写 convertExceptionToArray 方法，在错误响应中增加 code 数据，也就是获取异常中的 code。
+    protected function convertExceptionToArray(Exception $e)
+    {
+        return config('app.debug') ? [
+            'message' => $e->getMessage(),
+            'code' => $e->getCode(),
+            'exception' => get_class($e),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => collect($e->getTrace())->map(function ($trace) {
+                return Arr::except($trace, ['args']);
+            })->all(),
+        ] : [
+            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+        ];
+    }
 }
