@@ -15,6 +15,7 @@
         "guzzlehttp/guzzle": "~6.3",
         "intervention/image": "^2.5",
         "laravel/framework": "^6.2",
+        "laravel/passport": "^8.4",
         "laravel/tinker": "^2.0",
         "mews/captcha": "~3.0",
         "mews/purifier": "~3.0",
