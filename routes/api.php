@@ -120,6 +120,10 @@ Route::prefix('v1')
                     Route::patch('user/read/notifications', 'NotificationsController@read')
                         ->name('user.notifications.read');
 
+                    // 当前登录用户权限
+                    Route::get('user/permissions', 'PermissionsController@index')
+                        ->name('user.permissions.index');
+
                 });
 
 
